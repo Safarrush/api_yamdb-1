@@ -13,13 +13,13 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         validators=[
-        RegexValidator(regex=r'[^\w.@+-]+\z')
+        RegexValidator(regex=r'^[\w.@+-]+',)
         ],
         help_text='Логин'
     )
     email = models.EmailField(
         max_length=254,
-        unique=True,
+        verbose_name="Email", null=True, unique=True,
         help_text='Электронная почта'
     )
     first_name = models.CharField(
@@ -33,6 +33,7 @@ class User(AbstractUser):
         help_text='Имя'
     )
     bio = models.TextField(
+        max_length=600,
         blank=True,
         help_text='Биография'
     )
@@ -45,7 +46,7 @@ class User(AbstractUser):
         blank=True,
         max_length=150,
         editable=False,
-        unique=True,
+        #unique=True,
         help_text='Код подтвержения',
     )
 
