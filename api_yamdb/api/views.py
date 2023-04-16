@@ -13,7 +13,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserViewSerializer, SignUpSerializer, AuthenticatedSerializer
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
-
 EMAIL = f'from@yandex.ru'
 
 
@@ -42,7 +41,8 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             serializer = self.get_serializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
 @api_view(['POST'])
 @permission_classes((AllowAny,))
 def sign_up(request):
@@ -62,7 +62,7 @@ def sign_up(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 @api_view(['POST'])
 @permission_classes((AllowAny,))
@@ -78,4 +78,3 @@ def get_token(request):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
