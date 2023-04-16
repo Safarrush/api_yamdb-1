@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import ROLE, User
+from titles.models import Categories, Genres, Titles
 
 
 class UserViewSerializer(serializers.ModelSerializer):
@@ -13,7 +14,6 @@ class UserViewSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False)
     role = serializers.CharField(required=False, default='user')
 
-    
     class Meta:
         model = User
         fields = (
@@ -53,13 +53,13 @@ class SignUpSerializer(serializers.ModelSerializer):
         username = data.get('username')
         email = data.get('email')
         if (
-            User.objects.filter(username=username).exists()
-            and User.objects.get(username=username).email != email
+                User.objects.filter(username=username).exists()
+                and User.objects.get(username=username).email != email
         ):
             raise serializers.ValidationError('Такое имя уже существует!')
         if (
-            User.objects.filter(email=email).exists()
-            and User.objects.get(email=email).username != username
+                User.objects.filter(email=email).exists()
+                and User.objects.get(email=email).username != username
         ):
             raise serializers.ValidationError('Такая почта уже существует!')
         return data
@@ -83,3 +83,21 @@ class AuthenticatedSerializer(serializers.ModelSerializer):
         if confirmation_code is None:
             raise serializers.ValidationError('Это поле обязательно!')
         return data
+
+
+class CategoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Categories
+
+
+class GenresSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Genres
+
+
+class TitlesSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Titles

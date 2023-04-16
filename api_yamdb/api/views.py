@@ -10,8 +10,16 @@ from django.core.mail import send_mail
 from rest_framework.decorators import action, api_view, permission_classes
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserViewSerializer, SignUpSerializer, AuthenticatedSerializer
+from .serializers import (
+    UserViewSerializer,
+    SignUpSerializer,
+    AuthenticatedSerializer,
+    TitlesSerializer,
+    CategoriesSerializer,
+    GenresSerializer,
+)
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from titles.models import Categories, Genres, Titles
 
 EMAIL = f'from@yandex.ru'
 
@@ -78,3 +86,18 @@ def get_token(request):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Categories.objects.all()
+    serializer_class = CategoriesSerializer
+
+
+class GenresViewSet(viewsets.ModelViewSet):
+    queryset = Genres.objects.all()
+    serializer_class = GenresSerializer
+
+
+class TitlesViewSet(viewsets.ModelViewSet):
+    queryset = Titles.objects.all()
+    serializer_class = TitlesSerializer

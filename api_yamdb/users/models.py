@@ -8,12 +8,13 @@ ROLE = (
     ('admin', 'admin'),
 )
 
+
 class User(AbstractUser):
     username = models.CharField(
         max_length=150,
         unique=True,
         validators=[
-        RegexValidator(regex=r'^[\w.@+-]+',)
+            RegexValidator(regex=r'^[\w.@+-]+', )
         ],
         help_text='Логин'
     )
@@ -46,10 +47,9 @@ class User(AbstractUser):
         blank=True,
         max_length=150,
         editable=False,
-        #unique=True,
+        # unique=True,
         help_text='Код подтвержения',
     )
-
 
     class Meta:
         ordering = ('username',)
