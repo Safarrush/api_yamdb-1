@@ -4,7 +4,8 @@ from rest_framework import filters, mixins, permissions, status, viewsets, gener
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import IsAdmin
+from .permissions import (IsAdminOrReadOnlyPermission,
+                          IsAuthorAdminModeratorOrReadOnly, IsAdmin)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework.decorators import action, api_view, permission_classes
@@ -39,7 +40,7 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,)
     )
     def users_profile(self, request):
-        user = request.user
+        user = User.objects.get(username=request.user)
         if request.method == 'PATCH':
             serializer = self.get_serializer(
                 user, data=request.data, partial=True
@@ -91,13 +92,16 @@ def get_token(request):
 class CategoriesViewSet(viewsets.ModelViewSet):
     queryset = Categories.objects.all()
     serializer_class = CategoriesSerializer
+    permission_classes = (IsAdminOrReadOnlyPermission,)
 
 
 class GenresViewSet(viewsets.ModelViewSet):
     queryset = Genres.objects.all()
     serializer_class = GenresSerializer
+    permission_classes = (IsAdminOrReadOnlyPermission,)
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
     queryset = Titles.objects.all()
     serializer_class = TitlesSerializer
+    permission_classes = (IsAdminOrReadOnlyPermission,)
