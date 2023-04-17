@@ -2,13 +2,14 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.validators import UnicodeUsernameValidator
+import re
 
 from users.models import ROLE, User
 from titles.models import Categories, Genres, Titles
 
 
 class UserViewSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(validators=[UnicodeUsernameValidator,], max_length=150)
+    username = serializers.CharField(max_length=150)
     email = serializers.EmailField(max_length=254)
     first_name = serializers.CharField(required=False, max_length=150)
     last_name = serializers.CharField(required=False, max_length=150)
@@ -35,15 +36,15 @@ class UserViewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Это поле обязательно!')
         return email
     
-    def validate_role(self, role):
-        if role not in ROLE:
-            raise serializers.ValidationError('Таких ролей не существует!')
-        return role
+   # def validate_role(self, role):
+     #   if role not in ROLE:
+        #    raise serializers.ValidationError('Таких ролей не существует!')
+       # return role
 
 
 class SignUpSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True, max_length=254)
-    username = serializers.SlugField(validators=[UnicodeUsernameValidator,], required=True, max_length=150)
+    username = serializers.SlugField(required=True, max_length=150)
 
     class Meta:
         fields = ('email', 'username')
@@ -69,6 +70,9 @@ class SignUpSerializer(serializers.ModelSerializer):
                 and User.objects.get(email=email).username != username
         ):
             raise serializers.ValidationError('Такая почта уже существует!')
+        check_valid_username = re.search(r'[^\w.@+-]+', data.get('username'))
+        if check_valid_username is None:
+            raise serializers.ValidationError('Ошибка валидации')
         return data
 
 
