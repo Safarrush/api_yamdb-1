@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'rest_framework_simplejwt',
     'titles.apps.TitlesConfig',
+    'reviews.apps.ReviewsConfig',
 ]
 
 MIDDLEWARE = [
@@ -92,7 +93,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+        'PAGE_SIZE': 5,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',
