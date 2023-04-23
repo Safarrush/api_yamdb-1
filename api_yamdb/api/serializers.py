@@ -6,15 +6,6 @@ from users.models import ROLE, User
 
 
 class UserViewSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(regex=r'^[\w.@+-]+$', max_length=150)
-    first_name = serializers.CharField(max_length=150, required=False)
-    last_name = serializers.CharField(max_length=150, required=False)
-    email = serializers.CharField(max_length=254)
-    role = serializers.ChoiceField(
-        choices=ROLE,
-        default='user',
-        required=False
-    )
 
     class Meta:
         fields = (
@@ -22,26 +13,6 @@ class UserViewSerializer(serializers.ModelSerializer):
             'last_name', 'bio', 'role',
         )
         model = User
-
-    def validate_username(self, username):
-        if username == 'me':
-            raise serializers.ValidationError(
-                'Такое имя пользователя недоступно!'
-            )
-        if User.objects.filter(
-                username=username
-        ).exists():
-            raise serializers.ValidationError(
-                'Такое имя уже зарегистрироавно!'
-            )
-        return username
-
-    def validate_email(self, email):
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                'Такая почта уже зарегистрирована!'
-            )
-        return email
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -51,17 +22,35 @@ class SignUpSerializer(serializers.Serializer):
         max_length=150
     )
 
-    def validate_username(self, username):
-        if username == 'me':
+    def validate(self, data):
+        if data.get('username') == 'me':
             raise serializers.ValidationError(
-                'Такое имя пользователя недоступно!'
+                'Использовать имя me запрещено'
             )
-        return username
+        if User.objects.filter(username=data.get('username')).exists():
+            raise serializers.ValidationError(
+                'Такое имя уже существует'
+            )
+        if User.objects.filter(email=data.get('email')).exists():
+            raise serializers.ValidationError(
+                'Такая почта уже существует'
+            )
+        return data
 
 
 class AuthenticatedSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
+
+
+class MeSerializer(UserViewSerializer):
+    role = serializers.ChoiceField(
+        choices=ROLE,
+        default='user',
+    )
+
+    class Meta(UserViewSerializer.Meta):
+        read_only_fields = ('role',)
 
 
 class GenreSerializer(serializers.ModelSerializer):

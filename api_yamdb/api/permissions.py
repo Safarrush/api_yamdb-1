@@ -7,35 +7,17 @@ class IsAdminOrReadOnlyPermission(permissions.BasePermission):
         if request.user.is_authenticated:
             return (
                 request.method in permissions.SAFE_METHODS
-                or request.user.role == 'admin'
-                or request.user.is_superuser
-            )
-        return request.method in permissions.SAFE_METHODS
-
-    def has_object_permission(self, request, view, obj):
-        if request.user.is_authenticated:
-            return (
-                request.method in permissions.SAFE_METHODS
-                or request.user.role == 'admin'
-                or request.user.is_superuser
+                or request.user.is_admin
             )
         return request.method in permissions.SAFE_METHODS
 
 
 class IsAdmin(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return (
-                request.user.role == 'admin' or request.user.is_superuser
-            )
-        return False
 
-    def has_object_permission(self, request, view, obj):
-        if request.user.is_authenticated:
-            return (
-                request.user.role == 'admin' or request.user.is_superuser
-            )
-        return False
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated and request.user.is_admin
+        )
 
 
 class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
@@ -43,9 +25,9 @@ class AdminModeratorAuthorOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        elif request.method == 'POST' and request.user.is_user:
+        elif request.method == 'POST' and request.user.is_authenticated:
             return True
-        return request.method in ['PATCH', 'DELETE'] and (
-            request.user.role == 'admin'
-            or request.user.role == 'moderator'
+        return request.user.is_authenticated and (
+            request.user.is_admin
+            or request.user.is_moderator
             or request.user == obj.author)

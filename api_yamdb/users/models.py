@@ -1,36 +1,23 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+USER = 'user'
+
 ROLE = (
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin'),
+    (USER, USER),
+    (MODERATOR, MODERATOR),
+    (ADMIN, ADMIN),
 )
 
 
 class User(AbstractUser):
-    username = models.CharField(
-        max_length=150,
-        unique=True,
-        help_text='Логин'
-    )
     email = models.EmailField(
-        max_length=254,
         verbose_name="Email", unique=True,
         help_text='Электронная почта'
     )
-    first_name = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text='Фамилия'
-    )
-    last_name = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text='Имя'
-    )
     bio = models.TextField(
-        max_length=600,
         blank=True,
         help_text='Биография'
     )
@@ -45,6 +32,21 @@ class User(AbstractUser):
         editable=False,
         help_text='Код подтвержения',
     )
+
+    @property
+    def is_admin(self):
+        return (
+            self.is_staff or self.role == ADMIN
+            or self.is_superuser
+        )
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
+
+    @property
+    def is_user(self):
+        return self.role == USER
 
     class Meta:
         ordering = ('username',)
