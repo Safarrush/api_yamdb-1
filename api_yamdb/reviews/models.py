@@ -1,22 +1,28 @@
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from reviews.validators import validate_year
 from users.models import User
+
+LEN_NAME = settings.MAX_LEN_NAME
+LEN_SLUG = settings.MAX_LEN_SLUG
 
 
 class Category(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=LEN_NAME,
         unique=True,
         verbose_name='Название категории',
     )
     slug = models.SlugField(
-        max_length=50,
+        max_length=LEN_SLUG,
         unique=True,
         verbose_name='Слаг категории',
     )
 
     class Meta:
+        ordering = ['slug']
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
@@ -26,16 +32,17 @@ class Category(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(
-        max_length=256,
+        max_length=LEN_NAME,
         verbose_name='Название жанра',
     )
     slug = models.SlugField(
-        max_length=50,
+        max_length=LEN_SLUG,
         unique=True,
         verbose_name='Псевдоним жанра',
     )
 
     class Meta:
+        ordering = ['slug']
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
 
@@ -50,16 +57,17 @@ class Title(models.Model):
     )
     year = models.IntegerField(
         verbose_name='Год написания',
-        validators=(validate_year,)
+        validators=(validate_year,),
+        db_index=True,
     )
     description = models.TextField(
         verbose_name='Описание произведения',
-        null=True,
         blank=True,
     )
     genre = models.ManyToManyField(
         Genre,
         through='GenreTitle',
+        through_fields=('title', 'genre'),
     )
     category = models.ForeignKey(
         Category,
@@ -133,7 +141,7 @@ class Review(models.Model):
         )
 
     def __str__(self):
-        return self.text
+        return self.text[:30]
 
 
 class Comment(models.Model):
@@ -161,4 +169,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text
+        return self.text[:30]

@@ -18,7 +18,7 @@ from users.models import User
 
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
 
-from .mixins import CustomViewSet
+from api.mixins import CustomViewSet
 from .permissions import (AdminModeratorAuthorOrReadOnly, IsAdmin,
                           IsAdminOrReadOnlyPermission)
 from .serializers import (AuthenticatedSerializer, CategorySerializer,
@@ -124,7 +124,7 @@ class GenreViewSet(CustomViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(
-        rating=Avg('reviews__score'),
+        rating=Avg('reviews__score')
     ).order_by('name')
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter

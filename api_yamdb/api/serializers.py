@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from rest_framework import serializers
+
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import ROLE, User
 
@@ -28,7 +29,7 @@ class UserViewSerializer(serializers.ModelSerializer):
                 'Такое имя пользователя недоступно!'
             )
         if User.objects.filter(
-            username=username
+                username=username
         ).exists():
             raise serializers.ValidationError(
                 'Такое имя уже зарегистрироавно!'
@@ -102,7 +103,6 @@ class TitleWriteSerializer(TitleSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all(),
-        required=False,
     )
     genre = serializers.SlugRelatedField(
         slug_field='slug',
@@ -112,11 +112,8 @@ class TitleWriteSerializer(TitleSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.StringRelatedField(read_only=True)
-    title = serializers.SlugRelatedField(
-        slug_field='id',
-        many=False,
-        read_only=True,
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
     )
 
     class Meta:
@@ -127,11 +124,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             'author',
             'score',
             'pub_date',
-            'title',
         )
 
     def validate(self, data):
-        if not self.context.get('request').method == 'POST':
+        if self.context.get('request').method != 'POST':
             return data
         author = self.context.get('request').user
         title_id = self.context.get('view').kwargs.get('title_id')
