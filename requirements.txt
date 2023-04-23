@@ -21,3 +21,4 @@ requests==2.26.0
 sqlparse==0.4.3
 toml==0.10.2
 urllib3==1.26.15
+django-filter~=23.1
