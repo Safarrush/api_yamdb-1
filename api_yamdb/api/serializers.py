@@ -1,8 +1,7 @@
-from django.core.validators import RegexValidator
 from rest_framework import serializers
-
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import ROLE, User
+from users.models import User
+from users.validators import validate_username
 
 
 class UserViewSerializer(serializers.ModelSerializer):
@@ -16,26 +15,11 @@ class UserViewSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(max_length=254)
     username = serializers.CharField(
-        validators=[RegexValidator(regex=r'^[\w.@+-]+$')],
+        validators=[validate_username],
         max_length=150
     )
-
-    def validate(self, data):
-        if data.get('username') == 'me':
-            raise serializers.ValidationError(
-                'Использовать имя me запрещено'
-            )
-        if User.objects.filter(username=data.get('username')).exists():
-            raise serializers.ValidationError(
-                'Такое имя уже существует'
-            )
-        if User.objects.filter(email=data.get('email')).exists():
-            raise serializers.ValidationError(
-                'Такая почта уже существует'
-            )
-        return data
+    email = serializers.EmailField(max_length=254)
 
 
 class AuthenticatedSerializer(serializers.Serializer):
@@ -44,10 +28,6 @@ class AuthenticatedSerializer(serializers.Serializer):
 
 
 class MeSerializer(UserViewSerializer):
-    role = serializers.ChoiceField(
-        choices=ROLE,
-        default='user',
-    )
 
     class Meta(UserViewSerializer.Meta):
         read_only_fields = ('role',)

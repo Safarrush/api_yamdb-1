@@ -1,4 +1,3 @@
-import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -123,7 +122,7 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 AUTH_USER_MODEL = 'users.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 DEFAULT_FROM_EMAIL = 'admin@yandex.ru'
 MAX_LEN_NAME = 256
 MAX_LEN_SLUG = 50
