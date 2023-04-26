@@ -1,13 +1,3 @@
-from api.filters import TitleFilter
-from api.permissions import (AdminModeratorAuthorOrReadOnly, IsAdmin,
-                             IsAdminOrReadOnlyPermission)
-from api.serializers import (AuthenticatedSerializer, CategorySerializer,
-                             CommentSerializer, GenreSerializer, MeSerializer,
-                             ReviewSerializer, SignUpSerializer,
-                             TitleReadSerializer, TitleWriteSerializer,
-                             UserViewSerializer)
-from api.utils import (BaseCategoryGenreViewSet,
-                       BaseUserTitleReviewCommentViewSet)
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -21,7 +11,18 @@ from rest_framework.permissions import (SAFE_METHODS, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from reviews.models import Category, Comment, Genre, Review, Title
+
+from api.filters import TitleFilter
+from api.permissions import (AdminModeratorAuthorOrReadOnly, IsAdmin,
+                             IsAdminOrReadOnlyPermission)
+from api.serializers import (AuthenticatedSerializer, CategorySerializer,
+                             CommentSerializer, GenreSerializer, MeSerializer,
+                             ReviewSerializer, SignUpSerializer,
+                             TitleReadSerializer, TitleWriteSerializer,
+                             UserViewSerializer)
+from api.utils import (BaseCategoryGenreViewSet,
+                       BaseUserTitleReviewCommentViewSet)
+from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
 
@@ -166,5 +167,5 @@ class CommentViewSet(BaseUserTitleReviewCommentViewSet):
         serializer.save(author=self.request.user, review=self.get_review())
 
     def get_queryset(self):
-        review=self.get_review()
+        review = self.get_review()
         return review.comments.all()

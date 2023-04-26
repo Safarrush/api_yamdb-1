@@ -1,5 +1,6 @@
 from csv import DictReader
 
+from django.core.management import BaseCommand
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import User
 
@@ -74,14 +75,16 @@ def import_csv_data():
             f"Загрузка данных из {file} завершена успешно.")
 
 
-def main():
-    try:
-        import_csv_data()
-    except Exception as error:
-        print(f"Сбой в работе импорта: {error}.")
-    finally:
-        print("Завершена работа импорта.")
+class Command(BaseCommand):
+    help = ("Загрузка data из data/*.csv."
+            "Запуск: python manage.py load_csv_data."
+            "Подробнее об импорте в README.md.")
 
+    def handle(self, *args, **options):
+        print("Старт импорта")
 
-if __name__ == '__main__':
-    main()
+        try:
+            import_csv_data()
+
+        except Exception as error:
+            print(f"Сбой в работе импорта: {error}.")
