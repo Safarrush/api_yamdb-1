@@ -52,9 +52,7 @@ class UserViewSet(BaseUserTitleReviewCommentViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-def send_meil(user):
-    confirmation_code = default_token_generator.make_token(user)
-    user.save()
+def send_meil(user, confirmation_code):
     send_mail(
         subject='Регистрация',
         message=f'Код подтверждения: {confirmation_code}',
@@ -76,7 +74,8 @@ def sign_up(request):
     if user != user2:
         return Response(status=status.HTTP_400_BAD_REQUEST)
     user3, _ = User.objects.get_or_create(username=username, email=email)
-    send_meil(user3)
+    confirmation_code = default_token_generator.make_token(user3)
+    send_meil(user3, confirmation_code)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -91,11 +90,10 @@ def get_token(request):
     if default_token_generator.check_token(user, confirmation_code):
         token = AccessToken.for_user(user)
         return Response({'token': f'{token}'})
-    else:
-        return Response(
-            'Не подходит токен!',
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    return Response(
+        'Не подходит токен!',
+        status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 class CategoryViewSet(BaseCategoryGenreViewSet):

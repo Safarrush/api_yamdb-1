@@ -6,6 +6,7 @@ from .validators import validate_username
 ADMIN = 'admin'
 MODERATOR = 'moderator'
 USER = 'user'
+MAX_LENGTH = 150
 
 ROLE = (
     (USER, USER),
@@ -16,7 +17,7 @@ ROLE = (
 
 class User(AbstractUser):
     username = models.CharField(
-        max_length=150,
+        max_length=MAX_LENGTH,
         unique=True,
         validators=[validate_username]
     )
@@ -30,14 +31,14 @@ class User(AbstractUser):
     )
     role = models.TextField(
         choices=ROLE,
-        default='user',
+        default=USER,
         help_text='Роль'
     )
 
     @property
     def is_admin(self):
         return (
-            self.is_staff or self.role == ADMIN
+            self.is_staff or self.is_superuser or self.role == ADMIN
         )
 
     @property
@@ -45,7 +46,7 @@ class User(AbstractUser):
         return self.role == MODERATOR
 
     class Meta:
-
-        def __str__(self):
-            return self.username
         ordering = ('username',)
+
+    def __str__(self):
+        return self.username
