@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import User
+from users.models import User, MAX_LENGTH
 from users.validators import validate_username
 
 
@@ -17,7 +17,7 @@ class UserViewSerializer(serializers.ModelSerializer):
 class SignUpSerializer(serializers.Serializer):
     username = serializers.CharField(
         validators=[validate_username],
-        max_length=150
+        max_length=MAX_LENGTH
     )
     email = serializers.EmailField(max_length=254)
 
