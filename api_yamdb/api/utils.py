@@ -10,5 +10,5 @@ class BaseCategoryGenreViewSet(mixins.CreateModelMixin,
     search_fields = ('name',)
 
 
-class BaseUserTitleReviewCommentViewSet(viewsets.ModelViewSet):
+class BaseExcludePutMethodViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'patch', 'delete')

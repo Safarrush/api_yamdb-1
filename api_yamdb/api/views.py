@@ -21,12 +21,12 @@ from api.serializers import (AuthenticatedSerializer, CategorySerializer,
                              TitleReadSerializer, TitleWriteSerializer,
                              UserViewSerializer)
 from api.utils import (BaseCategoryGenreViewSet,
-                       BaseUserTitleReviewCommentViewSet)
+                       BaseExcludePutMethodViewSet)
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
 
-class UserViewSet(BaseUserTitleReviewCommentViewSet):
+class UserViewSet(BaseExcludePutMethodViewSet):
     queryset = User.objects.all()
     lookup_field = 'username'
     serializer_class = UserViewSerializer
@@ -116,7 +116,7 @@ class GenreViewSet(BaseCategoryGenreViewSet):
     )
 
 
-class TitleViewSet(BaseUserTitleReviewCommentViewSet):
+class TitleViewSet(BaseExcludePutMethodViewSet):
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).order_by('name')
@@ -133,7 +133,7 @@ class TitleViewSet(BaseUserTitleReviewCommentViewSet):
         return TitleWriteSerializer
 
 
-class ReviewViewSet(BaseUserTitleReviewCommentViewSet):
+class ReviewViewSet(BaseExcludePutMethodViewSet):
     serializer_class = ReviewSerializer
     permission_classes = (
         IsAuthenticatedOrReadOnly,
@@ -151,7 +151,7 @@ class ReviewViewSet(BaseUserTitleReviewCommentViewSet):
         return title.reviews.all()
 
 
-class CommentViewSet(BaseUserTitleReviewCommentViewSet):
+class CommentViewSet(BaseExcludePutMethodViewSet):
     serializer_class = CommentSerializer
     permission_classes = (
         IsAuthenticatedOrReadOnly,
