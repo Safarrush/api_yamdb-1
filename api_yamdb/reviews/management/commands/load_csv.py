@@ -1,25 +1,28 @@
+import datetime
 from csv import DictReader
-
+from django.shortcuts import get_object_or_404
 from django.core.management import BaseCommand
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import User
 
 
 def import_csv_data():
+    start_time = datetime.datetime.now()
+
     csv_files = (
-        (User, 'data/users.csv'),
-        (Category, 'data/category.csv'),
-        (Genre, 'data/genre.csv'),
-        (Title, 'data/titles.csv'),
-        (GenreTitle, 'data/genre_title.csv'),
-        (Review, 'data/review.csv'),
-        (Comment, 'data/comments.csv')
+        (User, 'reviews/management/data/users.csv'),
+        (Category, 'reviews/management/data/category.csv'),
+        (Genre, 'reviews/management/data/genre.csv'),
+        (Title, 'reviews/management/data/titles.csv'),
+        (GenreTitle, 'reviews/management/data/genre_title.csv'),
+        (Review, 'reviews/management/data/review.csv'),
+        (Comment, 'reviews/management/data/comments.csv')
     )
 
     for model, file in csv_files:
         print(f"Загрузка данных таблицы {file} началась.")
         for row in DictReader(open(file, encoding='utf-8')):
-            if file == 'data/users.csv':
+            if file == 'reviews/management/data/users.csv':
                 data = model(
                     id=row['id'],
                     username=row['username'],
@@ -30,29 +33,31 @@ def import_csv_data():
                     last_name=row['last_name']
                 )
                 data.save()
-            elif file in ['data/category.csv', 'data/genre.csv']:
+            elif (file == 'reviews/management/data/category.csv'
+                  or file == 'reviews/management/data/genre.csv'):
                 data = model(
                     id=row['id'],
                     name=row['name'],
                     slug=row['slug']
                 )
                 data.save()
-            elif file == 'data/titles.csv':
+            elif file == 'reviews/management/data/titles.csv':
+                category = get_object_or_404(Category, id=row['category'])
                 data = model(
                     id=row['id'],
                     name=row['name'],
                     year=row['year'],
-                    category_id=row['category_id']
+                    category=category
                 )
                 data.save()
-            elif file == 'data/genre_title.csv':
+            elif file == 'reviews/management/data/genre_title.csv':
                 data = model(
                     id=row['id'],
                     title_id=row['title_id'],
                     genre_id=row['genre_id']
                 )
                 data.save()
-            elif file == 'data/review.csv':
+            elif file == 'reviews/management/data/review.csv':
                 data = model(
                     id=row['id'],
                     title_id=row['title_id'],
@@ -62,7 +67,7 @@ def import_csv_data():
                     pub_date=row['pub_date']
                 )
                 data.save()
-            elif file == 'data/comments.csv':
+            elif file == 'reviews/management/data/comments.csv':
                 data = model(
                     id=row['id'],
                     review_id=row['review_id'],
@@ -72,11 +77,15 @@ def import_csv_data():
                 )
                 data.save()
         print(
-            f"Загрузка данных из {file} завершена успешно.")
+            f"Загрузка данных таблицы {file} завершена успешно.")
+
+    print(f"Загрузка данных завершена за"
+          f" {(datetime.datetime.now() - start_time).total_seconds()} "
+          f"сек.")
 
 
 class Command(BaseCommand):
-    help = ("Загрузка data из data/*.csv."
+    help = ("Загрузка data из reviews/management/data/*.csv."
             "Запуск: python manage.py load_csv_data."
             "Подробнее об импорте в README.md.")
 
@@ -88,3 +97,6 @@ class Command(BaseCommand):
 
         except Exception as error:
             print(f"Сбой в работе импорта: {error}.")
+
+        finally:
+            print("Завершена работа импорта.")

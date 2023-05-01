@@ -54,7 +54,7 @@ python manage.py migrate --run-syncdb
 Если есть необходимость, заполняем базу тестовыми данными командой:
 
 ```bash
-python manage.py load_csv_data
+python manage.py load_csv
 ```
 
 Создаем суперпользователя, после меняем в админ панели роль с user на admin:
