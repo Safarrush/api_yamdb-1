@@ -158,7 +158,11 @@ class CommentViewSet(BaseExcludePutMethodViewSet):
 
     def get_review(self):
         title_id = self.kwargs.get('title_id')
-        return get_object_or_404(Review, id=self.kwargs.get('review_id'), title__id=title_id)
+        return get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title__id=title_id
+        )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
